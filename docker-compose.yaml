@@ -4,6 +4,7 @@ services:
     image: postgres:15
     container_name: postgres
     environment:
+      POSTGRES_DB: userdb
       POSTGRES_USER: microadmin
       POSTGRES_PASSWORD: microadmin
 
@@ -16,7 +17,14 @@ services:
       retries: 10
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 
   user-service:
     build:
@@ -40,8 +48,7 @@ services:
     env_file:
       - ./product-service/.env
     depends_on:
-      postgres:
-        condition: service_healthy
+      mongodb
 
   gateway:
     build:
@@ -64,3 +71,4 @@ services:
 
 volumes:
   postgres_data:
+  mongo_data:

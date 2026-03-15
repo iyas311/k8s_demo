@@ -1,2 +1,0 @@
-CREATE DATABASE userdb;
-CREATE DATABASE productdb;

@@ -1,9 +1,6 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from database import SessionLocal, engine
-import models
+from fastapi import FastAPI
+from database import get_products_collection
 from fastapi.middleware.cors import CORSMiddleware
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.add_middleware(
@@ -14,28 +11,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 @app.get("/")
 def root():
     return {"service": "Product Service Running"}
 
-
 @app.post("/products")
-def create_product(name: str, price: int, db: Session = Depends(get_db)):
-    product = models.Product(name=name, price=price)
-    db.add(product)
-    db.commit()
-    db.refresh(product)
-    return product
-
+def create_product(name: str, price: int):
+    products = get_products_collection()
+    doc = {"name": name, "price": price}
+    result = products.insert_one(doc)
+    return {"id": str(result.inserted_id), "name": name, "price": price}
 
 @app.get("/products")
-def get_products(db: Session = Depends(get_db)):
-    return db.query(models.Product).all()
+def get_products():
+    products = get_products_collection()
+    out = []
+    for doc in products.find({}, {"name": 1, "price": 1}):
+        out.append({"id": str(doc.get("_id")), "name": doc.get("name"), "price": doc.get("price")})
+    return out
