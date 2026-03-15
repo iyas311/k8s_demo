@@ -48,7 +48,7 @@ services:
     env_file:
       - ./product-service/.env
     depends_on:
-      mongodb
+      - mongodb
 
   gateway:
     build:
