@@ -3,6 +3,8 @@ import "./App.css";
 
 function App() {
 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "/api/v1";
+
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
 
@@ -13,13 +15,13 @@ function App() {
   const [price, setPrice] = useState("");
 
   const loadUsers = () => {
-    fetch("http://localhost:8001/users")
+    fetch(`${API_BASE_URL}/users`)
       .then(res => res.json())
       .then(data => setUsers(data));
   }
 
   const loadProducts = () => {
-    fetch("http://localhost:8002/products")
+    fetch(`${API_BASE_URL}/products`)
       .then(res => res.json())
       .then(data => setProducts(data));
   }
@@ -31,7 +33,7 @@ function App() {
 
   const createUser = async () => {
 
-    await fetch(`http://localhost:8001/users?name=${name}&email=${email}`, {
+    await fetch(`${API_BASE_URL}/users?name=${name}&email=${email}`, {
       method: "POST"
     });
 
@@ -42,7 +44,7 @@ function App() {
 
   const createProduct = async () => {
 
-    await fetch(`http://localhost:8002/products?name=${productName}&price=${price}`, {
+    await fetch(`${API_BASE_URL}/products?name=${productName}&price=${price}`, {
       method: "POST"
     });
 
